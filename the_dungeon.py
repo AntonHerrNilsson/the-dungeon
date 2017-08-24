@@ -30,8 +30,8 @@ def run(world, steps=None, slp=0.5, show=True, player=None):
 
 
 
-
-dungeon = world.World()
-player = Player(dungeon, (5,5), PlayerAI, direction=(0,1))
-world.testing_room(dungeon)
-run(dungeon, player=player)
+if __name__ == "__main__":
+    dungeon = world.World()
+    player = Player(dungeon, (5,5), PlayerAI, direction=(0,1))
+    world.testing_room(dungeon)
+    run(dungeon, player=player)
