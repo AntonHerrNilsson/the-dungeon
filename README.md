@@ -5,7 +5,7 @@ Dependencies:
 * Python 3
 * NumPy
 
-To run it, just run:
+To try it, just run:
 ```
 python3 the_dungeon.py
 ```
