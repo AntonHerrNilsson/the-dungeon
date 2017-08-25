@@ -56,7 +56,6 @@ class PathFindingProblem(Problem):
             goal_locs = self.goal_locs
         except AttributeError:
             goal_locs = []
-            t = time.time()
             for loc in self.model.explored:
                 if self.goal_test((loc, None)):
                     goal_locs.append(loc)
