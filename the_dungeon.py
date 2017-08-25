@@ -1,4 +1,5 @@
 import sys
+import time
 
 import world
 from creatures import Player
