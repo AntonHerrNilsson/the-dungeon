@@ -9,3 +9,7 @@ To try it, just run:
 ```
 python3 the_dungeon.py
 ```
+
+Implemented concepts:
+* The basic framework
+* Pathfinding using A* search
