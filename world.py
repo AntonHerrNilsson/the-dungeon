@@ -66,22 +66,7 @@ class World:
         things = [thing for thing in self.locations.get(loc, []) 
                                 if isinstance(thing, thing_class)]
         return things
-    
-def testing_room(world, x_size=10, y_size=10):
-    # Just a small room to test pathfinding.
-    for x in range(x_size):
-        Wall(world, location=(x, 0))
-        Wall(world, location=(x, y_size - 1))
-    for y in range(y_size):
-        Wall(world, location=(0, y))
-        Wall(world, location=(x_size -1, y))
-    for to_spawn, amount in [(Wall, 10), (Gold, 10)]:
-        for i in range(amount):
-            cont = True
-            while cont:
-                x = random.randrange(0, x_size)
-                y = random.randrange(0, y_size)
-                cont = world.things_at((x,y))
-            to_spawn(world, location=(x,y))
+
+
 
 

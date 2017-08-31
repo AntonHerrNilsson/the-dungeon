@@ -23,3 +23,10 @@ DOWN = numpy.array((0,-1))
 LEFT = numpy.array((-1,0))
 RIGHT = numpy.array((1,0))
 
+# Symbol colors
+
+def light_blue(char):
+    return "\033[94m" + char + "\033[0m"
+
+def blue(char):
+    return "\033[34m" + char + "\033[0m"

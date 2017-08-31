@@ -1,5 +1,6 @@
 import numpy
 
+import utils
 from utils import ROTATE_LEFT, ROTATE_RIGHT
 
 
@@ -40,6 +41,7 @@ class Thing:
         self.move(self.direction)
     
     def symbol(self):
+        # Return a character (or several, if using escape sequences). Return None if the thing is invisible.
         raise NotImplementedError
 
 class Obstacle(Thing):
@@ -57,5 +59,69 @@ class Gold(Thing):
     
     def symbol(self):
         return "*"
+
+class Door(Thing):
+    
+    def __init__(self, world, location, closed=True):
+        super().__init__(world, location)
+        self.blocker = None
+        if closed:
+            self.close()
+        else:
+            self.open()
+    
+    def close(self):
+        self.closed = True
+        if self.blocker is None:
+            self.blocker = InvisibleWall(self.world, self.location)
+    
+    def open(self):
+        self.closed = False
+        if self.blocker is not None:
+            self.world.remove_thing(self.blocker)
+            self.blocker = None
+    
+    def toggle(self):
+        if self.closed:
+            self.open()
+        else:
+            self.close()
+    
+    def symbol(self):
+        if self.closed:
+            return utils.light_blue("#")
+        else:
+            return utils.blue("#")
+
+class InvisibleWall(Obstacle):
+    
+    def symbol(self):
+        return None
+
+class Switch(Thing):
+    
+    def __init__(self, world, location, target=None):
+        # target should be a method, like door.toggle
+        super().__init__(world, location)
+        if target is None:
+            self.targets = []
+        else:
+            self.targets= [target]
+    
+    def add_target(self, target):
+        self.targets.append(target)
+    
+    def remove_target(self, target):
+        self.targets.remove(target)
+    
+    def activate(self):
+        for target in self.targets:
+            target()
+    
+    def symbol(self):
+        return "!"
+            
+
         
+    
             

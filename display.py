@@ -65,10 +65,10 @@ def world_string(world, radius, center=None):
     world_string = ""
     for y in reversed(range(y_start, y_end)):
         for x in range(x_start, x_end):
-            things = world.things_at((x,y))
-            if things:
-                thing = things[0]
-                world_string += thing.symbol()
+            symbols = [thing.symbol() for thing in world.things_at((x,y)) 
+                        if thing.symbol() is not None]
+            if symbols:
+                world_string += symbols[0]
             else:
                 world_string += " "
             

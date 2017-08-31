@@ -1,8 +1,9 @@
 import numpy
 
 from world import World
-from things import Thing, Gold, Wall
+from things import Thing, Gold, Wall, Door, Switch
 from utils import IDENTITY, rotate_back_matrix
+import utils
 
 class Model(World):
     # Functionality has been added to track whether a tile has been 
@@ -13,7 +14,7 @@ class Model(World):
         self.explored = []
     
     def as_expected(self, location, symbols):
-        for thing, symbol in zip(self.things_at(location), symbols):
+        for thing, symbol in zip([thing for thing in self.things_at(location) if thing.symbol() is not None], symbols):
             if thing.symbol() != symbol:
                 return False
         return True
@@ -33,6 +34,7 @@ class Model(World):
                 else: # Just replace everything if something is wrong.
                     print("Something unexpected here!")
                     for thing in self.things_at(true_place):
+                        print(thing.symbol())
                         self.remove_thing(thing)
             else:
                 self.explored.append(true_place)
@@ -43,6 +45,12 @@ class Model(World):
                     Gold(self, true_place)
                 elif symbol == "#":
                     Wall(self, true_place)
+                elif symbol == utils.light_blue("#"):
+                    Door(self, true_place, closed=True)
+                elif symbol == utils.blue("#"):
+                    Door(self, true_place, closed=False)
+                elif symbol == "!":
+                    Switch(self, true_place)
     
     def things_at(self, location, thing_class=Thing):
         if tuple(location) in self.explored:

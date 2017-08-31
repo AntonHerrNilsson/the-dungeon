@@ -29,7 +29,8 @@ class Player(Thing):
                 loc = (x,y)
                 percieved[loc] = []
                 for thing in self.world.things_at(self.location + m.dot(loc)):
-                    percieved[loc].append(thing.symbol())
+                    if thing.symbol() is not None:
+                        percieved[loc].append(thing.symbol())
         return percieved
     
     def do_action(self, action):

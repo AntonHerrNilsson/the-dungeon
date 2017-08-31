@@ -56,11 +56,9 @@ class PathFindingProblem(Problem):
             goal_locs = self.goal_locs
         except AttributeError:
             goal_locs = []
-            t = time.time()
             for loc in self.model.explored:
                 if self.goal_test((loc, None)):
                     goal_locs.append(loc)
-            #print("goal locs: " + str(time.time()-t))
             self.goal_locs = goal_locs
         x1, y1 = state[0]
         # Manhattan distance to nearest goal
@@ -72,7 +70,6 @@ class PathFindingProblem(Problem):
 
 
 def find_path(goal, model, initial_location, initial_direction):
-    t = time.time()
     initial_state = (tuple(initial_location), tuple(initial_direction))
     problem = PathFindingProblem(initial_state, model, goal)
     solution = astar_search(problem)
@@ -93,8 +90,11 @@ def find_path(goal, model, initial_location, initial_direction):
             actions.append("TurnLeft")
             actions.append("TurnLeft")
             actions.append("Forward")
-    #print("total: " + str(time.time() - t))
     return actions
+
+def is_reachable(initial_location, goal, model):
+    # This can be done more efficiently, take a look at that when necessary.
+    pass
     
 
 
