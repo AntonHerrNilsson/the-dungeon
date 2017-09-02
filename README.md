@@ -13,3 +13,4 @@ python3 the_dungeon.py
 Implemented concepts:
 * The basic framework
 * Pathfinding using A* search
+* Opening doors and picking up gold in the optimal order, using uniform-cost search
