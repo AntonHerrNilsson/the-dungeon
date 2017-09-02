@@ -4,10 +4,10 @@ import IPython
 
 from AI import pathfinding
 from AI.door_handling import AbstractedDoorProblem
-import search
+from AI import search
 from creatures import Player
 from things import Gold
-import model
+from AI import model
 import symbols
 import utils
 from things import Wall, Gold, Door, Switch

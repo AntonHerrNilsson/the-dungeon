@@ -3,7 +3,7 @@ import numpy
 from inspect import isclass
 from copy import copy
 
-from search import Problem, astar_search
+from AI.search import Problem, astar_search
 from utils import UP, DOWN, LEFT, RIGHT
 from world import Thing, Obstacle
 

@@ -1,6 +1,6 @@
 
 
-import search
+from AI import search
 from copy import deepcopy
 from things import Switch, Gold, Door
 from AI import pathfinding
