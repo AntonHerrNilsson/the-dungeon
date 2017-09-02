@@ -1,5 +1,7 @@
 import numpy
+import IPython
 
+import symbols
 import utils
 from utils import ROTATE_LEFT, ROTATE_RIGHT
 
@@ -7,10 +9,11 @@ from utils import ROTATE_LEFT, ROTATE_RIGHT
 class Thing:
     """Something that can exist in the world."""
     
-    def __init__(self, world, location, direction=(0,0)):
+    def __init__(self, world, location, direction=(0,0), color=None):
         self.direction = direction
         self.world = world
         self.world.add_thing(self, location)
+        self.color = color
     
     @property
     def location(self):
@@ -39,10 +42,11 @@ class Thing:
     
     def move_forward(self):
         self.move(self.direction)
-    
+        
     def symbol(self):
-        # Return a character (or several, if using escape sequences). Return None if the thing is invisible.
+        # Return a character, or several if escape sequences are used. Return None if the thing is invisible.
         raise NotImplementedError
+
 
 class Obstacle(Thing):
     """Something that prevents movement into its location."""
@@ -52,18 +56,22 @@ class Wall(Obstacle):
     """Just an ordinary wall."""
     
     def symbol(self):
-        return "#"
+        return symbols.WALL
 
 class Gold(Thing):
     """When you pick it up you become happy"""
     
+    def get(self, actor):
+        self.world.remove_thing(self)
+        actor.score += 100
+    
     def symbol(self):
-        return "*"
+        return symbols.GOLD
 
 class Door(Thing):
     
-    def __init__(self, world, location, closed=True):
-        super().__init__(world, location)
+    def __init__(self, world, location, closed=True, **kwargs):
+        super().__init__(world, location, **kwargs)
         self.blocker = None
         if closed:
             self.close()
@@ -89,9 +97,9 @@ class Door(Thing):
     
     def symbol(self):
         if self.closed:
-            return utils.light_blue("#")
+            return symbols.CLOSED_DOOR
         else:
-            return utils.blue("#")
+            return symbols.OPEN_DOOR
 
 class InvisibleWall(Obstacle):
     
@@ -100,26 +108,28 @@ class InvisibleWall(Obstacle):
 
 class Switch(Thing):
     
-    def __init__(self, world, location, target=None):
+    def __init__(self, world, location, target=None, **kwargs):
         # target should be a method, like door.toggle
-        super().__init__(world, location)
+        super().__init__(world, location, **kwargs)
         if target is None:
             self.targets = []
         else:
             self.targets= [target]
     
     def add_target(self, target):
-        self.targets.append(target)
+        if target not in self.targets:
+            self.targets.append(target)
     
     def remove_target(self, target):
-        self.targets.remove(target)
+        if target in self.targets:
+            self.targets.remove(target)
     
-    def activate(self):
+    def activate(self, actor):
         for target in self.targets:
             target()
     
     def symbol(self):
-        return "!"
+        return symbols.SWITCH
             
 
         

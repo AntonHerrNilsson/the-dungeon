@@ -1,16 +1,15 @@
-import pyparsing
+import symbols
 
-from world import World
 
 
 def display(tick, score, centers, radius, *args):
     args = list(args)
     display_str = None
     for arg, center in zip(args, centers):
-        if isinstance(arg, World):
-            arg_str = world_string(arg, radius, center)
-        elif isinstance(arg, dict):
+        if isinstance(arg, dict):
             arg_str = percept_string(arg)
+        else:
+            arg_str = world_string(arg, radius, center)
         if display_str is None:
             display_str = prettify(arg_str)
         else:
@@ -19,7 +18,7 @@ def display(tick, score, centers, radius, *args):
     print(display_str)
     for i, ticktype in enumerate(["-","/","|","\\"]):
         if tick % 4 == i:
-            print(ticktype + " " + str(score))
+            print(ticktype + str(score) + "        ")
             
 def initialize():
     for i in range(50):
@@ -49,10 +48,10 @@ def combine_displays(left, right, spaces_between=10):
         display += "\n"
     return display
 
-def world_string(world, radius, center=None):
+def world_string(world, radius=None, center=None):
     # Do not be fooled by the radius, this returns a square map. 
     # If center is None, the entire world is shown instead.
-    if center is None:
+    if center is None or radius is None:
         x_start = min([loc[0] for loc in world.locations])
         y_start = min([loc[1] for loc in world.locations])
         x_end = max([loc[0] for loc in world.locations]) + 1
@@ -65,10 +64,10 @@ def world_string(world, radius, center=None):
     world_string = ""
     for y in reversed(range(y_start, y_end)):
         for x in range(x_start, x_end):
-            symbols = [thing.symbol() for thing in world.things_at((x,y)) 
+            things = [thing for thing in world.things_at((x,y)) 
                         if thing.symbol() is not None]
-            if symbols:
-                world_string += symbols[0]
+            if things:
+                world_string += symbols.apply_color(things[0].symbol(), things[0].color)
             else:
                 world_string += " "
             
@@ -86,9 +85,11 @@ def percept_string(percept):
             things = percept[(x,y)]
             if things:
                 thing = things[0]
-                if thing in [">", "v", "<"]:
-                    thing = "^"
-                out_string += thing
+                symbol = thing[0]
+                color = thing[1]
+                if symbol in [symbols.PLAYER_LEFT, symbols.PLAYER_DOWN, symbols.PLAYER_RIGHT]:
+                    symbol = symbols.PLAYER_UP
+                out_string += symbols.apply_color(symbol, color)
             else:
                 out_string += " "
         out_string += "\n"
@@ -96,15 +97,8 @@ def percept_string(percept):
     
 def prettify(string):
     lines = string.splitlines()
-    # Stripping out color codes
-    # https://stackoverflow.com/questions/2186919/getting-correct-string-length-in-python-for-strings-with-ansi-color-codes
-    ESC = pyparsing.Literal('\x1b')
-    integer = pyparsing.Word(pyparsing.nums)
-    escapeSeq = pyparsing.Combine(ESC + '[' + pyparsing.Optional(pyparsing.delimitedList(integer,';')) + 
-                    pyparsing.oneOf(list(pyparsing.alphas)))
-    nonAnsiString = lambda s : pyparsing.Suppress(escapeSeq).transformString(s)
-    unColorString = nonAnsiString(lines[0])
-    width = len(unColorString)
+    
+    width = len(symbols.strip_color(lines[0]))
     #IPython.embed()
     new_string = "╔" + width*"═" + "╗\n"
     for line in lines:

@@ -1,17 +1,19 @@
 import numpy
+import IPython
 
 from things import Thing, Obstacle, Gold
 from utils import IDENTITY, rotate_back_matrix, UP, DOWN, LEFT, RIGHT
+import symbols
 
 
 class Player(Thing):
     """The main character"""
     
-    def __init__(self, world, location, ai_class=None, direction=(0,1)):
-        super().__init__(world, location, direction)
+    def __init__(self, world, location, ai_class=None, direction=(0,1), **kwargs):
+        super().__init__(world, location, direction, **kwargs)
         if not ai_class is None:
             self.ai = ai_class()
-        self.performance = 0
+        self.score = 0
     
     def percept(self):
         percieved = {}
@@ -24,24 +26,42 @@ class Player(Thing):
             # Else, the agent should see the way it is facing as "up".
             m = rotate_back_matrix(self.direction)
         # Just percieve everything in a hardcoded square for now
-        for y in range(-10,11):
-            for x in range(-10,11):
+        for y in range(-20,21):
+            for x in range(-20,21):
                 loc = (x,y)
+                true_loc = self.location + m.dot(loc)
+                if self.world.outside_world(true_loc):
+                    continue
                 percieved[loc] = []
-                for thing in self.world.things_at(self.location + m.dot(loc)):
+                for thing in self.world.things_at(true_loc):
                     if thing.symbol() is not None:
-                        percieved[loc].append(thing.symbol())
+                        percieved[loc].append((thing.symbol(), thing.color))
         return percieved
     
     def do_action(self, action):
         if action.startswith("Get"): # e.g. "Get *"
-            char = action.split()[1]
-            things = [thing for thing in self.world.things_at(self.location) if thing.symbol() == char]
+            char_with_color = action.split()[1]
+            char = symbols.strip_color(char_with_color)
+            color = symbols.get_color(char_with_color)
+            things = [thing for thing in self.world.things_at(self.location) if thing.symbol() == char and thing.color == color]
             if things:
                 thing = things[0]
-                if isinstance(thing, Gold): # Only gold is implemented right now.
-                    self.performance += 100
-                    self.world.remove_thing(thing)
+                try:
+                    thing.get(actor=self)
+                except AttributeError:
+                    print("Tried to get something that is not gettable.")
+        elif action.startswith("Activate"):
+            char_with_color = action.split()[1]
+            char = symbols.strip_color(char_with_color)
+            color = symbols.get_color(char_with_color)
+            things = [thing for thing in self.world.things_at(self.location) if thing.symbol() == char and thing.color == color]
+            if things:
+                thing = things[0]
+                try:
+                    thing.activate(actor=self)
+                except AttributeError:
+                    print("Tried to activate something that is not activatable.")
+                
         elif action == "TurnRight":
             self.turn_right()
         elif action == "TurnLeft":
@@ -54,16 +74,16 @@ class Player(Thing):
         elif action == "NoOp":
             pass
         if action != "NoOp":
-            self.performance -= 1
+            self.score -= 1
         
     def symbol(self):
         d = tuple(self.direction)
         if d == tuple(RIGHT):
-            return ">"
+            return symbols.PLAYER_RIGHT
         elif d == tuple(UP):
-            return "^"
+            return symbols.PLAYER_UP
         elif d == tuple(LEFT):
-            return "<"
+            return symbols.PLAYER_LEFT
         elif d == tuple(DOWN):
-            return "v"
+            return symbols.PLAYER_DOWN
     

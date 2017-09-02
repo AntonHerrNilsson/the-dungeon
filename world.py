@@ -1,7 +1,10 @@
 import numpy
 import random
+import pickle
+import IPython
 
 from things import Thing, Obstacle, Wall, Gold
+from display import world_string
 
 
 class World:
@@ -66,6 +69,17 @@ class World:
         things = [thing for thing in self.locations.get(loc, []) 
                                 if isinstance(thing, thing_class)]
         return things
+    
+    def outside_world(self, location):
+        # Checks if the location is outside the defined world, so that it is not perceptible.
+        x, y = tuple(location)
+        return (x < min([key[0] for key in self.locations])
+                 or y < min([key[1] for key in self.locations])
+                 or x > max([key[0] for key in self.locations])
+                 or y > max([key[1] for key in self.locations]))
+    
+        
+            
 
 
 

@@ -1,4 +1,5 @@
 from things import Wall, Gold, Door, Switch
+import symbols
 
 def testing_room(world, x_size=10, y_size=10):
     # Just a small room to test pathfinding.
@@ -29,20 +30,24 @@ def room_from_string(room_string, world, offset=(0,0)):
                 Wall(world, (x+x0, y+y0))
                 
 def three_doors(world, offset=(0,0)):
-    room_string = """###################
-#     #     #     #
-#     #     #     #
-#  *  #  *  #  *  #
-#     #     #     #
-#     #     #     #
-### ##### ##### ###
-#                 #
-#                 #
-#                 #
-#                 #
-#                 #
-###################"""
+    room_string = """#########################
+#     #     #     #     #
+#     #     #     #     #
+#  *  #     #  *  #  *  #
+#     #     #     #     #
+#     #     #     #     #
+### ##### ##### ##### ###
+#                       #
+#                       #
+#                       #
+#                       #
+#                       #
+#########################"""
     room_from_string(room_string, world, offset)
-    door_one = Door(world, (9,6))
-    switch = Switch(world, (6,3), target=door_one.toggle)
+    door_one = Door(world, (9,6), color=symbols.LIGHT_BLUE, closed=True)
+    switch_one = Switch(world, (6,3), target=door_one.toggle, color=symbols.LIGHT_BLUE)
+    door_two = Door(world, (21,6), color=symbols.GREEN, closed=True)
+    switch_two = Switch(world, (9,9), target=door_two.toggle, color=symbols.GREEN)
+    door_three = Door(world, (15,6), color=symbols.LIGHT_BLUE, closed=False)
+    switch_one.add_target(door_three.toggle)
     
