@@ -68,8 +68,6 @@ class PathFindingProblem(Problem):
         else:
             return 0
             
-
-
 def find_path(goal, model, initial_location, initial_direction, return_direction=False):
     initial_state = (tuple(initial_location), tuple(initial_direction))
     problem = PathFindingProblem(initial_state, model, goal)
@@ -122,8 +120,6 @@ def reachable_from(location, model):
                 elif place in edge:
                     edge.remove(place)
     return reachable
-        
-    
     
 
 
